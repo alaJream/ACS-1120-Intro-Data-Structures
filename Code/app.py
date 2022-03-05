@@ -1,8 +1,20 @@
 """Main script, uses other modules to generate sentences."""
-from flask import Flask, render_template
+import pdb
+from flask import Flask, render_template, request, redirect
 from dictogram import Dictogram
+from twitter import TwitterBot
+from markov import markov_chain
+from markov import tweet_generator
+from tasks import open_and_low
+from tokens import tokenize
+from cleanup import read_file
 
 app = Flask(__name__)
+instance = TwitterBot()
+
+file = open_and_low('code/burgundy.txt')
+tokenized = tokenize(file)
+markov = markov_chain(tokenized)
 
 
 @app.before_first_request
@@ -20,6 +32,9 @@ def before_first_request():
 def home():
     """Route that returns a web page containing the generated text."""
     data = before_first_request()
+    sentence = 'hello'
+    a = instance.tweet(sentence)
+    
     return f'<p>{data.sample()}</p>'
 
 
