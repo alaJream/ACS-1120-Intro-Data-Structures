@@ -4,10 +4,9 @@ import pdb
 from flask import Flask, render_template, request, redirect
 from sentence import get_sentance, create_markov, create_histogram
 from dictogram import Dictogram
-from twitter import Twitter, TwitterBot
+from twitter import TwitterBot
 from markov import markov_chain
 from tokens import tokenize
-from cleanup import read_file
 
 app = Flask(__name__)
 instance = TwitterBot()
