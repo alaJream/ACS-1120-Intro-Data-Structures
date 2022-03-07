@@ -1,5 +1,5 @@
 from histogram import histogram, read_file
-file = 'code/script.txt'
+file = 'data/corpus.txt'
 from cleanup import read_file
 from tokens import tokenize
 from dictogram import Dictogram

@@ -1,42 +1,37 @@
 """Main script, uses other modules to generate sentences."""
+from distutils import text_file
 import pdb
 from flask import Flask, render_template, request, redirect
+from sentence import get_sentance, create_markov, create_histogram
 from dictogram import Dictogram
-from twitter import TwitterBot
+from twitter import Twitter, TwitterBot
 from markov import markov_chain
-from markov import tweet_generator
-from tasks import open_and_low
 from tokens import tokenize
 from cleanup import read_file
 
 app = Flask(__name__)
 instance = TwitterBot()
+text_file = 'data/corpus.txt'
+words = tokenize(text_file)
+histogram = create_histogram(words)
+markov = markov_chain(histogram, words)
 
-file = open_and_low('code/burgundy.txt')
-tokenized = tokenize(file)
-markov = markov_chain(tokenized)
 
-
-@app.before_first_request
-def before_first_request():
-    """Runs only once at Flask startup"""
-    # TODO: Initialize your histogram, hash table, or markov chain here.
-    arr = []
-    f = open('sjack.txt')
-    for line in f:
-        for word in line.split(' '):
-            arr.append(word)
-    return Dictogram(arr)
 
 @app.route("/")
 def home():
     """Route that returns a web page containing the generated text."""
-    data = before_first_request()
-    sentence = 'hello'
-    a = instance.tweet(sentence)
+    def index():
+        return render_template('index.html', title='Burgundy Tweet', generated_text=get_sentance(histogram, markov, 5))
     
-    return f'<p>{data.sample()}</p>'
+        # return f'<p>{data.sample()}</p>'
 
+@app.route('/tweet', methods=['POST'])
+def create_tweet():
+  status = request.form['sentence']
+  print(status)
+  TwitterBot.tweet(status)
+  return redirect('/')
 
 if __name__ == "__main__":
     """To run the Flask server, execute `python app.py` in your terminal.

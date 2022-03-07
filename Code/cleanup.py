@@ -1,21 +1,30 @@
 import re
+import enchant
 
+def cleaner(filename):
+  d = enchant.Dict("en_US")
+  tweets = []
+  with open(filename, 'r') as data:
+    for tweet in data:
+      temp = re.sub(r"@[A-Za-z0-9]+","",tweet)
+      temp = re.sub(r"#[A-Za-z0-9_]+","", temp)
+      temp = re.sub(r"http\S+", "", temp)
+      temp = re.sub(r"www.\S+", "", temp)
+      tweets.append(temp)
+  with open(filename, 'w') as data:
+    for tweet in tweets:
+      data.write(tweet)
+  words = []
+  with open(filename, 'r') as text:
+    for raw_line in text:
+        line = ''
+        for char in raw_line:
+              line += char
+        words += line.lower().split()
+  with open(filename, 'w') as data:
+    for word in words:
+      if d.check(word):
+        data.write(word + ' ')
 
-def clean_file(file):
-    with open(file, "r") as source_file:
-        lines = source_file.read()
-
-        cleaned_lines = re.sub("\[.*?\]", "", lines)
-        cleaned_lines = cleaned_lines.replace("‘", "\'")
-        cleaned_lines = cleaned_lines.replace("’", "\'")
-        cleaned_lines = cleaned_lines.replace("“", "\"")
-        cleaned_lines = cleaned_lines.replace("”", "\"")
-
-    with open(file, "w") as source_file:
-        source_file.write(cleaned_lines)
-
-    return cleaned_lines
-
-
-if __name__ == "__main__":
-    clean_file("data/corpus.txt")
+if __name__ == '__main__':
+  cleaner('data/corpus.txt')
